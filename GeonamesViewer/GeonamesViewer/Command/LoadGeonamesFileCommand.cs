@@ -15,9 +15,9 @@ namespace GeonamesViewer.Command
     /// </summary>
     internal class LoadGeonamesFileCommand : ICommand
     {
-        private readonly GraphicsOverlay _overlay;
+        private readonly GeonamesOverlay _overlay;
 
-        internal LoadGeonamesFileCommand(GraphicsOverlay overlay)
+        internal LoadGeonamesFileCommand(GeonamesOverlay overlay)
         {
             _overlay = overlay;
         }
@@ -102,15 +102,13 @@ namespace GeonamesViewer.Command
 
         private async Task AddRecordsAsync(IList<GeonamesRecord> records, TaskScheduler uiScheduler)
         {
+            // Create a copy of records
             var recordsCopy = new List<GeonamesRecord>(records);
-            await Task.Factory.StartNew(() =>
+            await Task.Factory.StartNew(async () =>
             {
                 foreach (var recordCopy in recordsCopy)
                 {
-                    var attributes = recordCopy.GetAttributes();
-                    var location = recordCopy.GetLocation();
-                    var graphic = new Graphic(location, attributes);
-                    _overlay.Graphics.Add(graphic);
+                    await _overlay.AddRecordAsync(recordCopy);
                 }
             }, CancellationToken.None, TaskCreationOptions.None, uiScheduler);
         }

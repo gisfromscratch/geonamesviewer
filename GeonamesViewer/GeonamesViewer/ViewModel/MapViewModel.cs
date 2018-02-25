@@ -24,6 +24,7 @@ using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
 using GeonamesViewer.Command;
+using GeonamesViewer.Model;
 
 namespace GeonamesViewer.ViewModel
 {
@@ -36,6 +37,8 @@ namespace GeonamesViewer.ViewModel
         private Map _map;
         private GraphicsOverlayCollection _overlays;
         private GraphicsOverlay _geonamesOverlay;
+        private GraphicsOverlay _countriesOverlay;
+        private FeatureLayer _countries;
         private ICommand _loadGeonamesFileCommand;
 
         public MapViewModel()
@@ -49,12 +52,18 @@ namespace GeonamesViewer.ViewModel
                     // Create a map
                     Map = new Map(_basemap);
 
-                    // Create a graphics overlay
+                    // Create and load the countries layer
+                    _countries = CreateWorldCountriesLayer();
+                    _countries.LoadAsync();
+
+                    // Create the graphics overlays
                     _geonamesOverlay = CreateGeonamesOverlay();
+                    _countriesOverlay = CreateCountriesOverlay();
 
                     // Add it to the map view
                     Overlays = new GraphicsOverlayCollection();
                     Overlays.Add(_geonamesOverlay);
+                    Overlays.Add(_countriesOverlay);
                     break;
 
                 default:
@@ -63,7 +72,13 @@ namespace GeonamesViewer.ViewModel
             }
 
             // Update the commands
-            LoadGeonamesFileCommand = new LoadGeonamesFileCommand(_geonamesOverlay);
+            var geonamesOverlay = new GeonamesOverlay(_geonamesOverlay, _countries, _countriesOverlay);
+            LoadGeonamesFileCommand = new LoadGeonamesFileCommand(geonamesOverlay);
+        }
+
+        private static FeatureLayer CreateWorldCountriesLayer()
+        {
+            return new FeatureLayer(new Uri(@"http://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Countries_(Generalized)/FeatureServer/0"));
         }
 
         private static GraphicsOverlay CreateGeonamesOverlay()
@@ -71,8 +86,17 @@ namespace GeonamesViewer.ViewModel
             var overlay = new GraphicsOverlay();
             overlay.RenderingMode = GraphicsRenderingMode.Static;
             overlay.Renderer = CreateGeonamesRenderer();
-            // TODO: Create a kind of spatial binning
-            //overlay.MinScale = 2000000;
+            overlay.MinScale = 3000000;
+            return overlay;
+        }
+
+        private static GraphicsOverlay CreateCountriesOverlay()
+        {
+            var overlay = new GraphicsOverlay();
+            overlay.RenderingMode = GraphicsRenderingMode.Static;
+            overlay.Renderer = CreateCountriesRenderer();
+            overlay.Opacity = 0.3;
+            overlay.MaxScale = 3000000;
             return overlay;
         }
 
@@ -80,6 +104,13 @@ namespace GeonamesViewer.ViewModel
         {
             var geonamesSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Circle, Colors.Black, 3);
             return new SimpleRenderer(geonamesSymbol);
+        }
+
+        private static Renderer CreateCountriesRenderer()
+        {
+            var countryBorderSymbol = new SimpleLineSymbol(SimpleLineSymbolStyle.Solid, Colors.Transparent, 0);
+            var countryFillSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Cross, Colors.Black, countryBorderSymbol);
+            return new SimpleRenderer(countryFillSymbol);
         }
 
         /// <summary>

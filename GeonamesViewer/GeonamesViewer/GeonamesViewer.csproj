@@ -72,6 +72,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Model\GeonamesOverlay.cs" />
     <Compile Include="Model\GeonamesRecord.cs" />
     <Compile Include="ViewModel\MapViewModel.cs" />
   </ItemGroup>
