@@ -45,7 +45,7 @@ namespace GeonamesViewer.ViewModel
         public MapViewModel()
         {
             // Initialize a new basemap
-            _basemap = Basemap.CreateTopographicVector();
+            _basemap = Basemap.CreateDarkGrayCanvasVector();
             var status = _basemap.LoadStatus;
             switch (status)
             {
@@ -99,21 +99,21 @@ namespace GeonamesViewer.ViewModel
             var overlay = new GraphicsOverlay();
             overlay.RenderingMode = GraphicsRenderingMode.Static;
             overlay.Renderer = CreateCountriesRenderer();
-            overlay.Opacity = 0.3;
+            overlay.Opacity = 0.75;
             overlay.MaxScale = 3000000;
             return overlay;
         }
 
         private static Renderer CreateGeonamesRenderer()
         {
-            var geonamesSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Diamond, Colors.Magenta, 5);
+            var geonamesSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Diamond, Colors.White, 8);
             return new SimpleRenderer(geonamesSymbol);
         }
 
         private static Renderer CreateCountriesRenderer()
         {
             var countryBorderSymbol = new SimpleLineSymbol(SimpleLineSymbolStyle.Solid, Colors.Transparent, 0);
-            var countryFillSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Cross, Colors.Magenta, countryBorderSymbol);
+            var countryFillSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Solid, Colors.White, countryBorderSymbol);
             return new SimpleRenderer(countryFillSymbol);
         }
 
@@ -125,8 +125,8 @@ namespace GeonamesViewer.ViewModel
             jsonBuilder.Append(@",");
             jsonBuilder.Append(CreateJsonPropertyAsString(@"labelPlacement", @"esriServerPointLabelPlacementAboveCenter"));
             var labelTextSymbol = new TextSymbol();
-            labelTextSymbol.Color = Colors.Magenta;
-            labelTextSymbol.Size = 10;
+            labelTextSymbol.Color = Colors.White;
+            labelTextSymbol.Size = 12;
             labelTextSymbol.FontFamily = @"Arial";
             labelTextSymbol.FontStyle = FontStyle.Normal;
             labelTextSymbol.FontWeight = FontWeight.Bold;
