@@ -4,13 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
-        xmlns:local="clr-namespace:GeonamesViewer"
+        xmlns:viewmodel="clr-namespace:GeonamesViewer.ViewModel"
         mc:Ignorable="d"
         Title="Geonames Viewer" Height="525" Width="790">
     <Window.Resources>
-        <local:MapViewModel x:Key="MapViewModel" />
+        <viewmodel:MapViewModel x:Key="MapViewModel" />
     </Window.Resources>
     <Grid>
-        <esri:MapView Map="{Binding Map, Source={StaticResource MapViewModel}}" />
+        <esri:MapView Map="{Binding Map, Source={StaticResource MapViewModel}}" GraphicsOverlays="{Binding Overlays, Source={StaticResource MapViewModel}}" />
     </Grid>
 </Window>
