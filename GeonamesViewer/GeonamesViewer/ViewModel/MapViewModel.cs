@@ -17,11 +17,13 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using System.Windows.Media;
 using Esri.ArcGISRuntime;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
+using GeonamesViewer.Command;
 
 namespace GeonamesViewer.ViewModel
 {
@@ -34,6 +36,7 @@ namespace GeonamesViewer.ViewModel
         private Map _map;
         private GraphicsOverlayCollection _overlays;
         private GraphicsOverlay _geonamesOverlay;
+        private ICommand _loadGeonamesFileCommand;
 
         public MapViewModel()
         {
@@ -58,6 +61,9 @@ namespace GeonamesViewer.ViewModel
                     // TODO: Error handling
                     break;
             }
+
+            // Update the commands
+            LoadGeonamesFileCommand = new LoadGeonamesFileCommand(_geonamesOverlay);
         }
 
         private static GraphicsOverlay CreateGeonamesOverlay()
@@ -95,6 +101,19 @@ namespace GeonamesViewer.ViewModel
             set
             {
                 _overlays = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the command for loading a geonames file.
+        /// </summary>
+        public ICommand LoadGeonamesFileCommand
+        {
+            get { return _loadGeonamesFileCommand; }
+            set
+            {
+                _loadGeonamesFileCommand = value;
                 OnPropertyChanged();
             }
         }

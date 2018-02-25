@@ -1,18 +1,5 @@
-﻿using Esri.ArcGISRuntime.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GeonamesViewer.ViewModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace GeonamesViewer
 {
@@ -21,9 +8,41 @@ namespace GeonamesViewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly MapViewModel _viewModel;
+
         public MainWindow()
         {
+            // Initialize view model
+            _viewModel = new MapViewModel();
+
+            DataContext = _viewModel;
             InitializeComponent();
+        }
+
+        private void MapView_DragEnter(object sender, DragEventArgs e)
+        {
+            // TODO: Use interactions or MVVM framework
+            var dragData = e.Data;
+            if (dragData.GetDataPresent(DataFormats.FileDrop))
+            {
+                var files = dragData.GetData(DataFormats.FileDrop);
+                if (_viewModel.LoadGeonamesFileCommand.CanExecute(files))
+                {
+                    e.Effects = DragDropEffects.Copy;
+                }
+                else
+                {
+                    e.Effects = DragDropEffects.None;
+                }
+                e.Handled = true;
+            }
+        }
+
+        private void MapView_Drop(object sender, DragEventArgs e)
+        {
+            // TODO: Use interactions or MVVM framework
+            var files = e.Data.GetData(DataFormats.FileDrop);
+            _viewModel.LoadGeonamesFileCommand.Execute(files);
         }
 
         // Map initialization logic is contained in MapViewModel.cs

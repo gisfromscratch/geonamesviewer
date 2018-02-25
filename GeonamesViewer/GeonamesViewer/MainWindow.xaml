@@ -8,9 +8,13 @@
         mc:Ignorable="d"
         Title="Geonames Viewer" Height="525" Width="790">
     <Window.Resources>
-        <viewmodel:MapViewModel x:Key="MapViewModel" />
     </Window.Resources>
     <Grid>
-        <esri:MapView Map="{Binding Map, Source={StaticResource MapViewModel}}" GraphicsOverlays="{Binding Overlays, Source={StaticResource MapViewModel}}" />
+        <esri:MapView 
+            Map="{Binding Map}" 
+            GraphicsOverlays="{Binding Overlays}"
+            AllowDrop="True"
+            DragEnter="MapView_DragEnter"
+            Drop="MapView_Drop"/>
     </Grid>
 </Window>
