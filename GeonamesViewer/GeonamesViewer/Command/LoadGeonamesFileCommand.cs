@@ -52,7 +52,7 @@ namespace GeonamesViewer.Command
             // Get the UI scheduler and start a new task for reading the file
             var filePaths = (string[]) parameter;
             var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            Task.Factory.StartNew(() =>
+            Task.Factory.StartNew(async () =>
             {
                 foreach (var filePath in filePaths)
                 {
@@ -82,7 +82,7 @@ namespace GeonamesViewer.Command
                                     if (0 == records.Count % bufferSize)
                                     {
                                         // Ensure the graphics are added using the UI scheduler
-                                        AddRecords(records, uiScheduler);
+                                        await AddRecordsAsync(records, uiScheduler);
                                         records.Clear();
                                     }
                                 }
@@ -92,18 +92,18 @@ namespace GeonamesViewer.Command
                         if (0 < records.Count)
                         {
                             // Ensure the graphics are added using the UI scheduler
-                            AddRecords(records, uiScheduler);
+                            await AddRecordsAsync(records, uiScheduler);
                             records.Clear();
                         }
                     }
                 }
-            });
+            }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
 
-        private void AddRecords(IList<GeonamesRecord> records, TaskScheduler uiScheduler)
+        private async Task AddRecordsAsync(IList<GeonamesRecord> records, TaskScheduler uiScheduler)
         {
             var recordsCopy = new List<GeonamesRecord>(records);
-            Task.Factory.StartNew(() =>
+            await Task.Factory.StartNew(() =>
             {
                 foreach (var recordCopy in recordsCopy)
                 {

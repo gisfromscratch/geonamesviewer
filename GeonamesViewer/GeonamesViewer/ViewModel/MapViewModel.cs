@@ -69,7 +69,10 @@ namespace GeonamesViewer.ViewModel
         private static GraphicsOverlay CreateGeonamesOverlay()
         {
             var overlay = new GraphicsOverlay();
+            overlay.RenderingMode = GraphicsRenderingMode.Static;
             overlay.Renderer = CreateGeonamesRenderer();
+            // TODO: Create a kind of spatial binning
+            //overlay.MinScale = 2000000;
             return overlay;
         }
 
