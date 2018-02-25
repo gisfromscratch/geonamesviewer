@@ -66,16 +66,9 @@ namespace GeonamesViewer.Model
             }
         }
 
-        private static Graphic CreateCountryGraphicFromFeature(Feature feature)
-        {
-            var attributes = new Dictionary<string, object>(feature.Attributes);
-            var geometryBuilder = new PolygonBuilder((Polygon) feature.Geometry);
-            var geometry = geometryBuilder.ToGeometry();
-            return new Graphic(geometry);
-        }
-
         private Graphic FindRelatedCountry(MapPoint location)
         {
+            // TODO: Use a spatial index!
             foreach (var country in _countryOverlay.Graphics)
             {
                 var countryGeometry = country.Geometry;

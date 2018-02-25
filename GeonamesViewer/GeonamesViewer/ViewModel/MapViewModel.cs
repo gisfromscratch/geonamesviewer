@@ -17,6 +17,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
 using Esri.ArcGISRuntime;
@@ -87,6 +88,9 @@ namespace GeonamesViewer.ViewModel
             overlay.RenderingMode = GraphicsRenderingMode.Static;
             overlay.Renderer = CreateGeonamesRenderer();
             overlay.MinScale = 3000000;
+            overlay.LabelsEnabled = true;
+            var labelDefinition = CreateGeonamesLabelDefinition();
+            overlay.LabelDefinitions.Add(labelDefinition);
             return overlay;
         }
 
@@ -102,15 +106,41 @@ namespace GeonamesViewer.ViewModel
 
         private static Renderer CreateGeonamesRenderer()
         {
-            var geonamesSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Circle, Colors.Black, 3);
+            var geonamesSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Diamond, Colors.Magenta, 5);
             return new SimpleRenderer(geonamesSymbol);
         }
 
         private static Renderer CreateCountriesRenderer()
         {
             var countryBorderSymbol = new SimpleLineSymbol(SimpleLineSymbolStyle.Solid, Colors.Transparent, 0);
-            var countryFillSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Cross, Colors.Black, countryBorderSymbol);
+            var countryFillSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Cross, Colors.Magenta, countryBorderSymbol);
             return new SimpleRenderer(countryFillSymbol);
+        }
+
+        private static LabelDefinition CreateGeonamesLabelDefinition()
+        {
+            var jsonBuilder = new StringBuilder();
+            jsonBuilder.Append(@"{");
+            jsonBuilder.Append(CreateJsonPropertyAsString(@"labelExpression", @"[Name]"));
+            jsonBuilder.Append(@",");
+            jsonBuilder.Append(CreateJsonPropertyAsString(@"labelPlacement", @"esriServerPointLabelPlacementAboveCenter"));
+            var labelTextSymbol = new TextSymbol();
+            labelTextSymbol.Color = Colors.Magenta;
+            labelTextSymbol.Size = 10;
+            labelTextSymbol.FontFamily = @"Arial";
+            labelTextSymbol.FontStyle = FontStyle.Normal;
+            labelTextSymbol.FontWeight = FontWeight.Bold;
+            var symbolAsJson = labelTextSymbol.ToJson();
+            jsonBuilder.Append(@",");
+            jsonBuilder.Append("\"symbol\":");
+            jsonBuilder.Append(symbolAsJson);
+            jsonBuilder.Append(@"}");
+            return LabelDefinition.FromJson(jsonBuilder.ToString());
+        }
+
+        private static string CreateJsonPropertyAsString(string key, string value)
+        {
+            return string.Format("\"{0}\":\"{1}\"", key, value);
         }
 
         /// <summary>
