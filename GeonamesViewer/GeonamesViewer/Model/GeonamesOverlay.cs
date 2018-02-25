@@ -1,9 +1,9 @@
-﻿using Esri.ArcGISRuntime;
-using Esri.ArcGISRuntime.Data;
+﻿using Esri.ArcGISRuntime.Data;
 using Esri.ArcGISRuntime.Geometry;
-using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.UI;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GeonamesViewer.Model
@@ -14,15 +14,17 @@ namespace GeonamesViewer.Model
     internal class GeonamesOverlay
     {
         private readonly GraphicsOverlay _detailedOverlay;
-        private readonly FeatureLayer _countryLayer;
+        private readonly ServiceFeatureTable _countryTable;
         private readonly GraphicsOverlay _countryOverlay;
         private bool _featureQueried;
+        private IDictionary<string, CountryEntry> _countries;
 
-        internal GeonamesOverlay(GraphicsOverlay detailedOverlay, FeatureLayer countryLayer, GraphicsOverlay countryOverlay)
+        internal GeonamesOverlay(GraphicsOverlay detailedOverlay, ServiceFeatureTable countryTable, GraphicsOverlay countryOverlay)
         {
             _detailedOverlay = detailedOverlay;
-            _countryLayer = countryLayer;
+            _countryTable = countryTable;
             _countryOverlay = countryOverlay;
+            _countries = new Dictionary<string, CountryEntry>();
         }
 
         /// <summary>
@@ -48,21 +50,52 @@ namespace GeonamesViewer.Model
             if (null != relatedCountry)
             {
                 relatedCountry.IsVisible = true;
+                var countryAttributes = relatedCountry.Attributes;
+                if (countryAttributes.ContainsKey(@"FID"))
+                {
+                    var fid = countryAttributes[@"FID"].ToString();
+                    if (_countries.ContainsKey(fid))
+                    {
+                        var countryEntry = _countries[fid];
+                        countryEntry.HitCount++;
+                    }
+                }
+            }
+        }
+
+        internal void ShowStatistics()
+        {
+            var countryList = _countries.ToList();
+            countryList.Sort((country, otherCountry) => country.Value.HitCount.CompareTo(otherCountry.Value.HitCount));
+            foreach (var country in countryList)
+            {
+#if DEBUG
+                Console.WriteLine(country);
+#endif
             }
         }
 
         private async Task QueryAllCountryFeaturesAsync()
         {
-            // Query the country features
+            // Query all the country features
             var parameters = new QueryParameters();
             parameters.WhereClause = @"1=1";
             parameters.ReturnGeometry = true;
-            var queryResult = await _countryLayer.FeatureTable.QueryFeaturesAsync(parameters);
+            //var queryResult = await _countryTable.QueryFeaturesAsync(parameters, QueryFeatureFields.LoadAll);
+            var outFields = new[] { @"*" };
+            var queryResult = await _countryTable.PopulateFromServiceAsync(parameters, true, outFields);
             foreach (var countryFeature in queryResult)
             {
-                var countryGraphic = new Graphic(countryFeature.Geometry);
+                var countryAttributes = countryFeature.Attributes;
+                var countryGraphic = new Graphic(countryFeature.Geometry, countryAttributes);
                 countryGraphic.IsVisible = false;
                 _countryOverlay.Graphics.Add(countryGraphic);
+                if (countryAttributes.ContainsKey(@"FID") && countryAttributes.ContainsKey(@"Country"))
+                {
+                    var fid = countryAttributes[@"FID"].ToString();
+                    var countryName = countryAttributes[@"Country"].ToString();
+                    _countries.Add(fid, new CountryEntry { Name = countryName, HitCount = 0L });
+                }
             }
         }
 

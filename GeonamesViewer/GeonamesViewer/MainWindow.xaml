@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
-        xmlns:viewmodel="clr-namespace:GeonamesViewer.ViewModel"
         mc:Ignorable="d"
         Title="Geonames Viewer" Height="525" Width="790">
     <Window.Resources>
@@ -14,6 +13,7 @@
             Map="{Binding Map}" 
             GraphicsOverlays="{Binding Overlays}"
             AllowDrop="True"
+            GeoViewDoubleTapped="MapView_GeoViewDoubleTapped"
             DragEnter="MapView_DragEnter"
             Drop="MapView_Drop"/>
     </Grid>

@@ -1,4 +1,5 @@
-﻿using GeonamesViewer.ViewModel;
+﻿using Esri.ArcGISRuntime.UI.Controls;
+using GeonamesViewer.ViewModel;
 using System.Windows;
 
 namespace GeonamesViewer
@@ -43,6 +44,15 @@ namespace GeonamesViewer
             // TODO: Use interactions or MVVM framework
             var files = e.Data.GetData(DataFormats.FileDrop);
             _viewModel.LoadGeonamesFileCommand.Execute(files);
+        }
+
+        private void MapView_GeoViewDoubleTapped(object sender, GeoViewInputEventArgs e)
+        {
+            // TOOD: Use command from UI
+            if (_viewModel.CalculateGeonamesStatisticsCommand.CanExecute(null))
+            {
+                _viewModel.CalculateGeonamesStatisticsCommand.Execute(null);
+            }
         }
 
         // Map initialization logic is contained in MapViewModel.cs

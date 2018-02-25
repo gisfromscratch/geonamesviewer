@@ -21,6 +21,7 @@ using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
 using Esri.ArcGISRuntime;
+using Esri.ArcGISRuntime.Data;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
@@ -39,8 +40,9 @@ namespace GeonamesViewer.ViewModel
         private GraphicsOverlayCollection _overlays;
         private GraphicsOverlay _geonamesOverlay;
         private GraphicsOverlay _countriesOverlay;
-        private FeatureLayer _countries;
+        private ServiceFeatureTable _countries;
         private ICommand _loadGeonamesFileCommand;
+        private ICommand _calculateGeonamesStatisticsCommand;
 
         public MapViewModel()
         {
@@ -54,7 +56,7 @@ namespace GeonamesViewer.ViewModel
                     Map = new Map(_basemap);
 
                     // Create and load the countries layer
-                    _countries = CreateWorldCountriesLayer();
+                    _countries = CreateWorldCountriesTable();
                     _countries.LoadAsync();
 
                     // Create the graphics overlays
@@ -75,11 +77,14 @@ namespace GeonamesViewer.ViewModel
             // Update the commands
             var geonamesOverlay = new GeonamesOverlay(_geonamesOverlay, _countries, _countriesOverlay);
             LoadGeonamesFileCommand = new LoadGeonamesFileCommand(geonamesOverlay);
+            CalculateGeonamesStatisticsCommand = new CalculateGeonamesStatisticsCommand(geonamesOverlay);
         }
 
-        private static FeatureLayer CreateWorldCountriesLayer()
+        private static ServiceFeatureTable CreateWorldCountriesTable()
         {
-            return new FeatureLayer(new Uri(@"http://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Countries_(Generalized)/FeatureServer/0"));
+            var table = new ServiceFeatureTable(new Uri(@"http://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Countries_(Generalized)/FeatureServer/0"));
+            table.FeatureRequestMode = FeatureRequestMode.ManualCache;
+            return table;
         }
 
         private static GraphicsOverlay CreateGeonamesOverlay()
@@ -178,6 +183,19 @@ namespace GeonamesViewer.ViewModel
             set
             {
                 _loadGeonamesFileCommand = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the command for calculating the statistics.
+        /// </summary>
+        public ICommand CalculateGeonamesStatisticsCommand
+        {
+            get { return _calculateGeonamesStatisticsCommand; }
+            set
+            {
+                _calculateGeonamesStatisticsCommand = value;
                 OnPropertyChanged();
             }
         }
