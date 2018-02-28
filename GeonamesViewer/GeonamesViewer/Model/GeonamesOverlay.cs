@@ -58,6 +58,10 @@ namespace GeonamesViewer.Model
                     {
                         var countryEntry = _countries[fid];
                         countryEntry.HitCount++;
+                        if (countryAttributes.ContainsKey(@"HitCount"))
+                        {
+                            countryAttributes[@"HitCount"] = countryEntry.HitCount;
+                        }
                     }
                 }
             }
@@ -86,7 +90,8 @@ namespace GeonamesViewer.Model
             var queryResult = await _countryTable.PopulateFromServiceAsync(parameters, true, outFields);
             foreach (var countryFeature in queryResult)
             {
-                var countryAttributes = countryFeature.Attributes;
+                var countryAttributes = new Dictionary<string, object>(countryFeature.Attributes);
+                countryAttributes.Add(@"HitCount", 0L);
                 var countryGraphic = new Graphic(countryFeature.Geometry, countryAttributes);
                 countryGraphic.IsVisible = false;
                 _countryOverlay.Graphics.Add(countryGraphic);

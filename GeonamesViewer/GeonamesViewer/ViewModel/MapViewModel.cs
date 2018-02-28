@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -106,6 +107,9 @@ namespace GeonamesViewer.ViewModel
             overlay.Renderer = CreateCountriesRenderer();
             overlay.Opacity = 0.75;
             overlay.MaxScale = 3000000;
+            overlay.LabelsEnabled = true;
+            var labelDefinition = CreateCountriesLabelDefinition();
+            overlay.LabelDefinitions.Add(labelDefinition);
             return overlay;
         }
 
@@ -119,18 +123,44 @@ namespace GeonamesViewer.ViewModel
         {
             var countryBorderSymbol = new SimpleLineSymbol(SimpleLineSymbolStyle.Solid, Colors.Transparent, 0);
             var countryFillSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Solid, Colors.White, countryBorderSymbol);
-            return new SimpleRenderer(countryFillSymbol);
+
+            var breaks = new List<ClassBreak>();
+            var firstColor = Color.FromRgb(200, 200, 200);
+            var firstSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Solid, firstColor, countryBorderSymbol);
+            var firstBreak = new ClassBreak(@"Low hit count", @"Low", 0, 5, firstSymbol);
+            breaks.Add(firstBreak);
+            var secondColor = Color.FromRgb(210, 210, 210);
+            var secondSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Solid, secondColor, countryBorderSymbol);
+            var secondBreak = new ClassBreak(@"Medium hit count", @"Medium", 6, 50, secondSymbol);
+            breaks.Add(secondBreak);
+            var thirdColor = Color.FromRgb(220, 220, 220);
+            var thirdSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Solid, thirdColor, countryBorderSymbol);
+            var thirdBreak = new ClassBreak(@"Medium hit count", @"Medium", 51, 100, secondSymbol);
+            breaks.Add(thirdBreak);
+            var renderer = new ClassBreaksRenderer(@"HitCount", breaks);
+            renderer.DefaultSymbol = countryFillSymbol;
+            return renderer;
         }
 
         private static LabelDefinition CreateGeonamesLabelDefinition()
         {
+            return CreateLabelDefinition(@"[Name]", @"esriServerPointLabelPlacementAboveCenter", Colors.White);
+        }
+
+        private static LabelDefinition CreateCountriesLabelDefinition()
+        {
+            return CreateLabelDefinition(@"[HitCount]", @"esriServerPolygonPlacementAlwaysHorizontal", Colors.Black);
+        }
+
+        private static LabelDefinition CreateLabelDefinition(string expression, string placement, Color textColor)
+        {
             var jsonBuilder = new StringBuilder();
             jsonBuilder.Append(@"{");
-            jsonBuilder.Append(CreateJsonPropertyAsString(@"labelExpression", @"[Name]"));
+            jsonBuilder.Append(CreateJsonPropertyAsString(@"labelExpression", expression));
             jsonBuilder.Append(@",");
-            jsonBuilder.Append(CreateJsonPropertyAsString(@"labelPlacement", @"esriServerPointLabelPlacementAboveCenter"));
+            jsonBuilder.Append(CreateJsonPropertyAsString(@"labelPlacement", placement));
             var labelTextSymbol = new TextSymbol();
-            labelTextSymbol.Color = Colors.White;
+            labelTextSymbol.Color = textColor;
             labelTextSymbol.Size = 12;
             labelTextSymbol.FontFamily = @"Arial";
             labelTextSymbol.FontStyle = FontStyle.Normal;
