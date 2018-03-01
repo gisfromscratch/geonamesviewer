@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
         mc:Ignorable="d"
-        Title="Geonames Viewer" Height="525" Width="790">
+        Title="Geonames Viewer" Height="525" Width="790"
+        Closing="Window_Closing">
     <Window.Resources>
     </Window.Resources>
     <Grid>
@@ -13,6 +14,7 @@
             Map="{Binding Map}" 
             GraphicsOverlays="{Binding Overlays}"
             AllowDrop="True"
+            SpatialReferenceChanged="MapView_SpatialReferenceChanged"
             GeoViewDoubleTapped="MapView_GeoViewDoubleTapped"
             DragEnter="MapView_DragEnter"
             Drop="MapView_Drop"/>

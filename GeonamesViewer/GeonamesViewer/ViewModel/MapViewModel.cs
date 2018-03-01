@@ -21,6 +21,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Esri.ArcGISRuntime;
 using Esri.ArcGISRuntime.Data;
 using Esri.ArcGISRuntime.Mapping;
@@ -41,6 +42,8 @@ namespace GeonamesViewer.ViewModel
         private GraphicsOverlayCollection _overlays;
         private GraphicsOverlay _geonamesOverlay;
         private GraphicsOverlay _countriesOverlay;
+        private DispatcherTimer _timer;
+        private bool _raiseOpacity;
         private ServiceFeatureTable _countries;
         private ICommand _loadGeonamesFileCommand;
         private ICommand _calculateGeonamesStatisticsCommand;
@@ -64,6 +67,11 @@ namespace GeonamesViewer.ViewModel
                     _geonamesOverlay = CreateGeonamesOverlay();
                     _countriesOverlay = CreateCountriesOverlay();
 
+                    // Create a timer
+                    _timer = new DispatcherTimer(DispatcherPriority.ApplicationIdle);
+                    _timer.Interval = new TimeSpan(0, 0, 0, 0, 500);
+                    _timer.Tick += Animate;
+
                     // Add it to the map view
                     Overlays = new GraphicsOverlayCollection();
                     Overlays.Add(_geonamesOverlay);
@@ -79,6 +87,40 @@ namespace GeonamesViewer.ViewModel
             var geonamesOverlay = new GeonamesOverlay(_geonamesOverlay, _countries, _countriesOverlay);
             LoadGeonamesFileCommand = new LoadGeonamesFileCommand(geonamesOverlay);
             CalculateGeonamesStatisticsCommand = new CalculateGeonamesStatisticsCommand(geonamesOverlay);
+        }
+
+        private void Animate(object sender, EventArgs e)
+        {
+            const double minOpacity = 0.25;
+            const double maxOpacity = 0.75;
+            const double interval = 0.25;
+            var opacity = _countriesOverlay.Opacity;
+            if (_raiseOpacity)
+            {
+                if (opacity < maxOpacity)
+                {
+                    opacity += interval;
+                }
+                else
+                {
+                    opacity -= interval;
+                    _raiseOpacity = !_raiseOpacity;
+                }
+            }
+            else
+            {
+                if (minOpacity < opacity)
+                {
+                    opacity -= interval;
+                }
+                else
+                {
+                    opacity += interval;
+                    _raiseOpacity = !_raiseOpacity;
+                }
+            }
+
+            _countriesOverlay.Opacity = opacity;
         }
 
         private static ServiceFeatureTable CreateWorldCountriesTable()
@@ -176,6 +218,16 @@ namespace GeonamesViewer.ViewModel
         private static string CreateJsonPropertyAsString(string key, string value)
         {
             return string.Format("\"{0}\":\"{1}\"", key, value);
+        }
+
+        internal void StartAnimation()
+        {
+            _timer.Start();
+        }
+
+        internal void StopAnimation()
+        {
+            _timer.Stop();
         }
 
         /// <summary>

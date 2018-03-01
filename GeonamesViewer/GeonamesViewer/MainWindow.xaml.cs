@@ -55,6 +55,16 @@ namespace GeonamesViewer
             }
         }
 
+        private void MapView_SpatialReferenceChanged(object sender, System.EventArgs e)
+        {
+            _viewModel.StartAnimation();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _viewModel.StopAnimation();
+        }
+
         // Map initialization logic is contained in MapViewModel.cs
     }
 }
