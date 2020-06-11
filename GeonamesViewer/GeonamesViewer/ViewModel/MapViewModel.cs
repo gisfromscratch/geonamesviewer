@@ -222,12 +222,18 @@ namespace GeonamesViewer.ViewModel
 
         internal void StartAnimation()
         {
+#if DEBUG
+#else
             _timer.Start();
+#endif
         }
 
         internal void StopAnimation()
         {
+#if DEBUG
+#else
             _timer.Stop();
+#endif
         }
 
         /// <summary>
