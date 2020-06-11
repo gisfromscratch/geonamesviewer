@@ -20,6 +20,11 @@ namespace GeonamesViewer
             {
                 // Deployed applications must be licensed at the Lite level or greater. 
                 // See https://developers.arcgis.com/licensing for further details.
+                var licenseKey = Environment.GetEnvironmentVariable(@"arcgisruntime.license.key");
+                if (!string.IsNullOrEmpty(licenseKey))
+                {
+                    ArcGISRuntimeEnvironment.SetLicense(licenseKey);
+                }
 
                 // Initialize the ArcGIS Runtime before any components are created.
                 ArcGISRuntimeEnvironment.Initialize();
