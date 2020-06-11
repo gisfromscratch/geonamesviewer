@@ -17,10 +17,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Esri.ArcGISRuntime;
 using Esri.ArcGISRuntime.Data;
@@ -157,25 +157,25 @@ namespace GeonamesViewer.ViewModel
 
         private static Renderer CreateGeonamesRenderer()
         {
-            var geonamesSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Diamond, Colors.White, 8);
+            var geonamesSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Diamond, Color.White, 8);
             return new SimpleRenderer(geonamesSymbol);
         }
 
         private static Renderer CreateCountriesRenderer()
         {
-            var countryBorderSymbol = new SimpleLineSymbol(SimpleLineSymbolStyle.Solid, Colors.Transparent, 0);
-            var countryFillSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Solid, Colors.White, countryBorderSymbol);
+            var countryBorderSymbol = new SimpleLineSymbol(SimpleLineSymbolStyle.Solid, Color.Transparent, 0);
+            var countryFillSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Solid, Color.White, countryBorderSymbol);
 
             var breaks = new List<ClassBreak>();
-            var firstColor = Color.FromRgb(200, 200, 200);
+            var firstColor = Color.FromArgb(200, 200, 200);
             var firstSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Solid, firstColor, countryBorderSymbol);
             var firstBreak = new ClassBreak(@"Low hit count", @"Low", 0, 5, firstSymbol);
             breaks.Add(firstBreak);
-            var secondColor = Color.FromRgb(210, 210, 210);
+            var secondColor = Color.FromArgb(210, 210, 210);
             var secondSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Solid, secondColor, countryBorderSymbol);
             var secondBreak = new ClassBreak(@"Medium hit count", @"Medium", 6, 50, secondSymbol);
             breaks.Add(secondBreak);
-            var thirdColor = Color.FromRgb(220, 220, 220);
+            var thirdColor = Color.FromArgb(220, 220, 220);
             var thirdSymbol = new SimpleFillSymbol(SimpleFillSymbolStyle.Solid, thirdColor, countryBorderSymbol);
             var thirdBreak = new ClassBreak(@"Medium hit count", @"Medium", 51, 100, secondSymbol);
             breaks.Add(thirdBreak);
@@ -186,12 +186,12 @@ namespace GeonamesViewer.ViewModel
 
         private static LabelDefinition CreateGeonamesLabelDefinition()
         {
-            return CreateLabelDefinition(@"[Name]", @"esriServerPointLabelPlacementAboveCenter", Colors.White);
+            return CreateLabelDefinition(@"[Name]", @"esriServerPointLabelPlacementAboveCenter", Color.White);
         }
 
         private static LabelDefinition CreateCountriesLabelDefinition()
         {
-            return CreateLabelDefinition(@"[HitCount]", @"esriServerPolygonPlacementAlwaysHorizontal", Colors.Black);
+            return CreateLabelDefinition(@"[HitCount]", @"esriServerPolygonPlacementAlwaysHorizontal", Color.Black);
         }
 
         private static LabelDefinition CreateLabelDefinition(string expression, string placement, Color textColor)
@@ -205,7 +205,7 @@ namespace GeonamesViewer.ViewModel
             labelTextSymbol.Color = textColor;
             labelTextSymbol.Size = 12;
             labelTextSymbol.FontFamily = @"Arial";
-            labelTextSymbol.FontStyle = FontStyle.Normal;
+            labelTextSymbol.FontStyle = Esri.ArcGISRuntime.Symbology.FontStyle.Normal;
             labelTextSymbol.FontWeight = FontWeight.Bold;
             var symbolAsJson = labelTextSymbol.ToJson();
             jsonBuilder.Append(@",");
