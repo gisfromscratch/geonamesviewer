@@ -95,10 +95,11 @@ namespace GeonamesViewer.Model
                 var countryGraphic = new Graphic(countryFeature.Geometry, countryAttributes);
                 countryGraphic.IsVisible = false;
                 _countryOverlay.Graphics.Add(countryGraphic);
-                if (countryAttributes.ContainsKey(@"FID") && countryAttributes.ContainsKey(@"Country"))
+                const string countryFieldName = @"COUNTRY";
+                if (countryAttributes.ContainsKey(@"FID") && countryAttributes.ContainsKey(countryFieldName))
                 {
                     var fid = countryAttributes[@"FID"].ToString();
-                    var countryName = countryAttributes[@"Country"].ToString();
+                    var countryName = countryAttributes[countryFieldName].ToString();
                     _countries.Add(fid, new CountryEntry { Name = countryName, HitCount = 0L });
                 }
             }

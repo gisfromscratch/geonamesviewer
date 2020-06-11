@@ -125,7 +125,7 @@ namespace GeonamesViewer.ViewModel
 
         private static ServiceFeatureTable CreateWorldCountriesTable()
         {
-            var table = new ServiceFeatureTable(new Uri(@"http://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Countries_(Generalized)/FeatureServer/0"));
+            var table = new ServiceFeatureTable(new Uri(@"https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Countries_(Generalized)/FeatureServer/0"));
             table.FeatureRequestMode = FeatureRequestMode.ManualCache;
             return table;
         }
