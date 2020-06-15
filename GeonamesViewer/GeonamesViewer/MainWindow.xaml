@@ -11,7 +11,8 @@
     <Window.Resources>
     </Window.Resources>
     <Grid>
-        <esri:MapView 
+        <esri:MapView
+            x:Name="FocusMapView"
             Map="{Binding Map}" 
             GraphicsOverlays="{Binding Overlays}"
             AllowDrop="True"

@@ -27,6 +27,7 @@ using Esri.ArcGISRuntime.Data;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
+using Esri.ArcGISRuntime.UI.Controls;
 using GeonamesViewer.Command;
 using GeonamesViewer.Model;
 
@@ -47,6 +48,7 @@ namespace GeonamesViewer.ViewModel
         private ServiceFeatureTable _countries;
         private ICommand _loadGeonamesFileCommand;
         private ICommand _calculateGeonamesStatisticsCommand;
+        private ICommand _exportMapScreenshotCommand;
 
         public MapViewModel()
         {
@@ -87,6 +89,11 @@ namespace GeonamesViewer.ViewModel
             var geonamesOverlay = new GeonamesOverlay(_geonamesOverlay, _countries, _countriesOverlay);
             LoadGeonamesFileCommand = new LoadGeonamesFileCommand(geonamesOverlay);
             CalculateGeonamesStatisticsCommand = new CalculateGeonamesStatisticsCommand(geonamesOverlay);
+        }
+
+        internal void UpdateMapView(MapView focusMapView)
+        {
+            ExportMapScreenshotCommand = new ExportMapScreenshotCommand(focusMapView);
         }
 
         private void Animate(object sender, EventArgs e)
@@ -284,6 +291,19 @@ namespace GeonamesViewer.ViewModel
             set
             {
                 _calculateGeonamesStatisticsCommand = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the command for exporting the focus map as a screenshot.
+        /// </summary>
+        public ICommand ExportMapScreenshotCommand
+        {
+            get { return _exportMapScreenshotCommand; }
+            set
+            {
+                _exportMapScreenshotCommand = value;
                 OnPropertyChanged();
             }
         }

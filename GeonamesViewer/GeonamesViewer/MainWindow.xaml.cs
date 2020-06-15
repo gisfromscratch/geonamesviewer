@@ -18,6 +18,9 @@ namespace GeonamesViewer
 
             DataContext = _viewModel;
             InitializeComponent();
+
+            // Plug the current mapview into the view model
+            _viewModel.UpdateMapView(FocusMapView);
         }
 
         private void MapView_DragEnter(object sender, DragEventArgs e)
@@ -52,6 +55,11 @@ namespace GeonamesViewer
             if (_viewModel.CalculateGeonamesStatisticsCommand.CanExecute(null))
             {
                 _viewModel.CalculateGeonamesStatisticsCommand.Execute(null);
+            }
+
+            if (_viewModel.ExportMapScreenshotCommand.CanExecute(null))
+            {
+                _viewModel.ExportMapScreenshotCommand.Execute(null);
             }
         }
 
